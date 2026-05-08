@@ -5,6 +5,41 @@ import { countries } from './countries.js';
 
 const EARTH_TEXTURE_URL =
   'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
+const WORLD_BORDERS_URL =
+  'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
+
+const flagCodes = {
+  japan: 'jp',
+  usa: 'us',
+  china: 'cn',
+  korea: 'kr',
+  india: 'in',
+  australia: 'au',
+  france: 'fr',
+  uk: 'gb',
+  brazil: 'br',
+  egypt: 'eg',
+  canada: 'ca',
+  mexico: 'mx',
+  germany: 'de',
+  italy: 'it',
+  spain: 'es',
+  russia: 'ru',
+  thailand: 'th',
+  indonesia: 'id',
+  'south-africa': 'za',
+  'saudi-arabia': 'sa',
+  argentina: 'ar',
+  chile: 'cl',
+  peru: 'pe',
+  turkey: 'tr',
+  greece: 'gr',
+  netherlands: 'nl',
+  sweden: 'se',
+  'new-zealand': 'nz',
+  vietnam: 'vn',
+  singapore: 'sg',
+};
 
 const difficultyOptions = [
   { id: 'easy', label: 'やさしい', includes: ['easy'] },
@@ -38,39 +73,34 @@ function getGlobeSize() {
   };
 }
 
-function createReadableGlobeMaterial() {
-  const loader = new THREE.TextureLoader();
-  loader.setCrossOrigin('anonymous');
-
-  const texture = loader.load(EARTH_TEXTURE_URL, (loadedTexture) => {
-    if ('colorSpace' in loadedTexture) {
-      loadedTexture.colorSpace = THREE.SRGBColorSpace;
-    }
-    loadedTexture.anisotropy = 4;
-    loadedTexture.needsUpdate = true;
-  });
-
-  if ('colorSpace' in texture) {
-    texture.colorSpace = THREE.SRGBColorSpace;
-  }
-
-  return new THREE.MeshBasicMaterial({
-    map: texture,
-    color: '#ffffff',
-    transparent: false,
-    opacity: 1,
-    depthWrite: true,
-    depthTest: true,
-    blending: THREE.NormalBlending,
-    side: THREE.FrontSide,
-    toneMapped: false,
-  });
-}
-
 function tuneGlobeScene(globe) {
   if (!globe || typeof window === 'undefined') return;
 
   const isMobileWidth = window.innerWidth <= 720;
+  const material = globe.globeMaterial?.();
+
+  if (material) {
+    material.color = new THREE.Color('#ffffff');
+    material.transparent = false;
+    material.opacity = 1;
+    material.depthWrite = true;
+    material.depthTest = true;
+    material.blending = THREE.NormalBlending;
+    material.side = THREE.FrontSide;
+
+    if ('emissive' in material) material.emissive = new THREE.Color('#225f87');
+    if ('emissiveIntensity' in material) material.emissiveIntensity = isMobileWidth ? 0.38 : 0.22;
+    if ('shininess' in material) material.shininess = isMobileWidth ? 4 : 8;
+    if ('roughness' in material) material.roughness = isMobileWidth ? 0.84 : 0.74;
+    if (material.map && 'colorSpace' in material.map) {
+      material.map.colorSpace = THREE.SRGBColorSpace;
+    }
+    if (material.map && 'anisotropy' in material.map) {
+      material.map.anisotropy = isMobileWidth ? 2 : 4;
+    }
+    material.needsUpdate = true;
+  }
+
   const scene = globe.scene?.();
   if (!scene) return;
 
@@ -135,22 +165,39 @@ class GlobeErrorBoundary extends Component {
   }
 }
 
-function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
+function getFlagUrl(country) {
+  return `https://flagcdn.com/${flagCodes[country.id]}.svg`;
+}
+
+function WorldGlobe({
+  visibleCountries,
+  selectedCountry,
+  autoRotate,
+  showBorders,
+  onCountrySelect,
+}) {
   const globeRef = useRef(null);
   const [globeSize, setGlobeSize] = useState(getGlobeSize);
+  const [borderData, setBorderData] = useState(null);
   const [isCompactGlobe, setIsCompactGlobe] = useState(() =>
     typeof window === 'undefined' ? false : window.innerWidth <= 720,
   );
-  const globeMaterial = useMemo(() => createReadableGlobeMaterial(), []);
 
   const markerData = useMemo(
     () =>
       visibleCountries.map((country) => ({
         ...country,
-        size: selectedCountry?.id === country.id ? 0.88 : 0.74,
+        size:
+          selectedCountry?.id === country.id
+            ? isCompactGlobe
+              ? 1.24
+              : 1.04
+            : isCompactGlobe
+              ? 1.08
+              : 0.88,
         color: selectedCountry?.id === country.id ? '#ffe36e' : '#ff5d73',
       })),
-    [selectedCountry, visibleCountries],
+    [isCompactGlobe, selectedCountry, visibleCountries],
   );
 
   useEffect(() => {
@@ -168,7 +215,7 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
 
     try {
       const controls = globeRef.current.controls();
-      controls.autoRotate = true;
+      controls.autoRotate = autoRotate;
       controls.autoRotateSpeed = 0.45;
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
@@ -186,6 +233,37 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!globeRef.current) return;
+
+    try {
+      const controls = globeRef.current.controls();
+      controls.autoRotate = autoRotate;
+    } catch {
+      // Keep the app usable if controls are not ready yet.
+    }
+  }, [autoRotate]);
+
+  useEffect(() => {
+    if (!showBorders || borderData) return;
+
+    let cancelled = false;
+    fetch(WORLD_BORDERS_URL)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!cancelled) {
+          setBorderData(data?.features ?? []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBorderData([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [borderData, showBorders]);
+
   const handleCountrySelect = (country) => {
     onCountrySelect(country);
     globeRef.current?.pointOfView(
@@ -201,7 +279,7 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
         width={globeSize.width}
         height={globeSize.height}
         backgroundColor="rgba(0,0,0,0)"
-        globeMaterial={globeMaterial}
+        globeImageUrl={EARTH_TEXTURE_URL}
         showAtmosphere={!isCompactGlobe}
         atmosphereColor="#9ee9ff"
         atmosphereAltitude={0.18}
@@ -209,21 +287,18 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
         pointsData={markerData}
         pointLat="lat"
         pointLng="lng"
-        pointAltitude={0.045}
+        pointAltitude={0.052}
         pointRadius={(country) => country.size}
         pointColor="color"
-        pointResolution={24}
-        labelsData={markerData}
-        labelLat="lat"
-        labelLng="lng"
-        labelAltitude={0.13}
-        labelText={(country) => `${country.flag} ${country.name}`}
-        labelSize={1.12}
-        labelDotRadius={0.18}
-        labelColor={() => '#ffffff'}
-        labelResolution={2}
+        pointResolution={32}
+        pointLabel={(country) => country.name}
+        polygonsData={showBorders ? borderData ?? [] : []}
+        polygonAltitude={0.004}
+        polygonCapColor={() => 'rgba(255, 255, 255, 0)'}
+        polygonSideColor={() => 'rgba(255, 255, 255, 0)'}
+        polygonStrokeColor={() => (isCompactGlobe ? 'rgba(255, 236, 143, 0.42)' : 'rgba(255, 236, 143, 0.56)')}
+        polygonLabel={(feature) => feature?.properties?.name ?? ''}
         onPointClick={handleCountrySelect}
-        onLabelClick={handleCountrySelect}
         onPointHover={(country) => {
           document.body.style.cursor = country ? 'pointer' : 'auto';
         }}
@@ -253,6 +328,27 @@ function DifficultySelector({ difficulty, countryCount, onDifficultyChange }) {
   );
 }
 
+function GlobeControls({ autoRotate, showBorders, onAutoRotateChange, onShowBordersChange }) {
+  return (
+    <div className="globe-control-block" aria-label="地球儀の表示設定">
+      <button
+        type="button"
+        className={autoRotate ? 'active' : ''}
+        onClick={() => onAutoRotateChange(!autoRotate)}
+      >
+        地球を回す：{autoRotate ? 'オン' : 'オフ'}
+      </button>
+      <button
+        type="button"
+        className={showBorders ? 'active' : ''}
+        onClick={() => onShowBordersChange(!showBorders)}
+      >
+        国境線：{showBorders ? 'オン' : 'オフ'}
+      </button>
+    </div>
+  );
+}
+
 function LearnPanel({ selectedCountry, countryCount, onClose }) {
   if (!selectedCountry) {
     return (
@@ -267,7 +363,7 @@ function LearnPanel({ selectedCountry, countryCount, onClose }) {
   return (
     <article className="country-card" aria-live="polite">
       <div className="flag-badge" aria-hidden="true">
-        {selectedCountry.flag}
+        <img src={getFlagUrl(selectedCountry)} alt="" loading="lazy" />
       </div>
       <div className="card-copy">
         <p className="card-label">見つけた国</p>
@@ -350,6 +446,8 @@ function QuizPanel({
 export default function App() {
   const [mode, setMode] = useState('learn');
   const [difficulty, setDifficulty] = useState('easy');
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [showBorders, setShowBorders] = useState(false);
   const visibleCountries = useMemo(() => getCountriesForDifficulty(difficulty), [difficulty]);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [quizCountry, setQuizCountry] = useState(() =>
@@ -469,17 +567,25 @@ export default function App() {
             countryCount={visibleCountries.length}
             onDifficultyChange={changeDifficulty}
           />
+          <GlobeControls
+            autoRotate={autoRotate}
+            showBorders={showBorders}
+            onAutoRotateChange={setAutoRotate}
+            onShowBordersChange={setShowBorders}
+          />
         </div>
       </header>
 
       <section className="learning-stage" aria-label="3D地球儀と学習パネル">
         <div className="globe-area" aria-label="回転できる3D地球儀">
           <GlobeErrorBoundary>
-            <WorldGlobe
-              visibleCountries={visibleCountries}
-              selectedCountry={highlightedCountry}
-              onCountrySelect={handleCountrySelect}
-            />
+              <WorldGlobe
+                visibleCountries={visibleCountries}
+                selectedCountry={highlightedCountry}
+                autoRotate={autoRotate}
+                showBorders={showBorders}
+                onCountrySelect={handleCountrySelect}
+              />
           </GlobeErrorBoundary>
           <div className="globe-hint">ドラッグで回転・ホイールやピンチでズーム</div>
         </div>
