@@ -5,8 +5,6 @@ import { countries } from './countries.js';
 
 const EARTH_TEXTURE_URL =
   'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
-const BUMP_TEXTURE_URL =
-  'https://unpkg.com/three-globe/example/img/earth-topology.png';
 
 const difficultyOptions = [
   { id: 'easy', label: 'やさしい', includes: ['easy'] },
@@ -40,21 +38,39 @@ function getGlobeSize() {
   };
 }
 
-function tuneGlobeBrightness(globe) {
+function createReadableGlobeMaterial() {
+  const loader = new THREE.TextureLoader();
+  loader.setCrossOrigin('anonymous');
+
+  const texture = loader.load(EARTH_TEXTURE_URL, (loadedTexture) => {
+    if ('colorSpace' in loadedTexture) {
+      loadedTexture.colorSpace = THREE.SRGBColorSpace;
+    }
+    loadedTexture.anisotropy = 4;
+    loadedTexture.needsUpdate = true;
+  });
+
+  if ('colorSpace' in texture) {
+    texture.colorSpace = THREE.SRGBColorSpace;
+  }
+
+  return new THREE.MeshBasicMaterial({
+    map: texture,
+    color: '#ffffff',
+    transparent: false,
+    opacity: 1,
+    depthWrite: true,
+    depthTest: true,
+    blending: THREE.NormalBlending,
+    side: THREE.FrontSide,
+    toneMapped: false,
+  });
+}
+
+function tuneGlobeScene(globe) {
   if (!globe || typeof window === 'undefined') return;
 
   const isMobileWidth = window.innerWidth <= 720;
-  const material = globe.globeMaterial?.();
-
-  if (material) {
-    material.color = new THREE.Color('#ffffff');
-    material.emissive = new THREE.Color('#2a78a8');
-    material.emissiveIntensity = isMobileWidth ? 0.46 : 0.3;
-    material.shininess = isMobileWidth ? 3 : 6;
-    if ('roughness' in material) material.roughness = isMobileWidth ? 0.82 : 0.72;
-    material.needsUpdate = true;
-  }
-
   const scene = globe.scene?.();
   if (!scene) return;
 
@@ -62,7 +78,7 @@ function tuneGlobeBrightness(globe) {
     {
       name: 'mobile-friendly-ambient',
       create: () => new THREE.AmbientLight('#ffffff'),
-      intensity: isMobileWidth ? 2.45 : 1.65,
+      intensity: isMobileWidth ? 1.4 : 0.95,
     },
     {
       name: 'mobile-friendly-front-light',
@@ -71,7 +87,7 @@ function tuneGlobeBrightness(globe) {
         light.position.set(1.2, 1.1, 1.6);
         return light;
       },
-      intensity: isMobileWidth ? 1.8 : 1.2,
+      intensity: isMobileWidth ? 0.55 : 0.35,
     },
     {
       name: 'mobile-friendly-fill-light',
@@ -80,7 +96,7 @@ function tuneGlobeBrightness(globe) {
         light.position.set(-1.4, 0.5, 1.1);
         return light;
       },
-      intensity: isMobileWidth ? 1.1 : 0.65,
+      intensity: isMobileWidth ? 0.35 : 0.22,
     },
   ];
 
@@ -122,6 +138,10 @@ class GlobeErrorBoundary extends Component {
 function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
   const globeRef = useRef(null);
   const [globeSize, setGlobeSize] = useState(getGlobeSize);
+  const [isCompactGlobe, setIsCompactGlobe] = useState(() =>
+    typeof window === 'undefined' ? false : window.innerWidth <= 720,
+  );
+  const globeMaterial = useMemo(() => createReadableGlobeMaterial(), []);
 
   const markerData = useMemo(
     () =>
@@ -136,7 +156,8 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
   useEffect(() => {
     const handleResize = () => {
       setGlobeSize(getGlobeSize());
-      tuneGlobeBrightness(globeRef.current);
+      setIsCompactGlobe(window.innerWidth <= 720);
+      tuneGlobeScene(globeRef.current);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -154,7 +175,7 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
       controls.minDistance = 170;
       controls.maxDistance = 560;
 
-      tuneGlobeBrightness(globeRef.current);
+      tuneGlobeScene(globeRef.current);
       globeRef.current.pointOfView({ lat: 22, lng: 135, altitude: 2.25 }, 900);
     } catch {
       // The fallback boundary keeps the rest of the app visible if the 3D layer is not ready.
@@ -180,12 +201,11 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
         width={globeSize.width}
         height={globeSize.height}
         backgroundColor="rgba(0,0,0,0)"
-        globeImageUrl={EARTH_TEXTURE_URL}
-        bumpImageUrl={BUMP_TEXTURE_URL}
-        showAtmosphere
+        globeMaterial={globeMaterial}
+        showAtmosphere={!isCompactGlobe}
         atmosphereColor="#9ee9ff"
         atmosphereAltitude={0.18}
-        onGlobeReady={() => tuneGlobeBrightness(globeRef.current)}
+        onGlobeReady={() => tuneGlobeScene(globeRef.current)}
         pointsData={markerData}
         pointLat="lat"
         pointLng="lng"

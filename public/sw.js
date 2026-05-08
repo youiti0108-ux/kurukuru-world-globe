@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kurukuru-world-globe-v4';
+const CACHE_NAME = 'kurukuru-world-globe-v5-bright-globe';
 const CORE_ASSETS = [
   './',
   './index.html',
