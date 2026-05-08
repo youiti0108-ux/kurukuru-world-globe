@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="くるくる世界地球儀">
+  <rect width="512" height="512" rx="112" fill="#071326"/>
+  <circle cx="256" cy="248" r="154" fill="#2da8ff"/>
+  <path d="M128 218c48 22 88 18 130-4 39-21 78-23 126 2 10 35 8 74-8 108-45-19-82-16-121 8-43 26-82 26-130 2-18-38-17-78 3-116Z" fill="#5ee2a0"/>
+  <path d="M186 126c27 21 45 51 54 90 10 51 5 109-21 162M326 126c-27 21-45 51-54 90-10 51-5 109 21 162" fill="none" stroke="#dff7ff" stroke-width="14" stroke-linecap="round" opacity=".9"/>
+  <path d="M106 248h300M144 160c70 32 154 32 224 0M144 336c70-32 154-32 224 0" fill="none" stroke="#dff7ff" stroke-width="14" stroke-linecap="round" opacity=".85"/>
+  <path d="M120 394c78 48 194 48 272 0" fill="none" stroke="#ffe36e" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="402" cy="102" r="17" fill="#ffe36e"/>
+  <path d="M94 96l11 24 24 11-24 11-11 24-11-24-24-11 24-11 11-24Z" fill="#ffffff"/>
+</svg>

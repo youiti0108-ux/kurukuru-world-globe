@@ -1,0 +1,25 @@
+{
+  "name": "くるくる世界地球儀",
+  "short_name": "世界地球儀",
+  "description": "地球儀を回して世界の国を学べる小学生向け学習アプリ",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#071326",
+  "theme_color": "#071326",
+  "icons": [
+    {
+      "src": "./icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
