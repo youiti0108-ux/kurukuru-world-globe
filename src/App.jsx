@@ -1,5 +1,6 @@
 import { Component, useEffect, useMemo, useRef, useState } from 'react';
 import Globe from 'react-globe.gl';
+import * as THREE from 'three';
 import { countries } from './countries.js';
 
 const EARTH_TEXTURE_URL =
@@ -37,6 +38,61 @@ function getGlobeSize() {
     width: Math.max(Math.floor(width), 320),
     height: Math.max(Math.floor(height), 340),
   };
+}
+
+function tuneGlobeBrightness(globe) {
+  if (!globe || typeof window === 'undefined') return;
+
+  const isMobileWidth = window.innerWidth <= 720;
+  const material = globe.globeMaterial?.();
+
+  if (material) {
+    material.color = new THREE.Color('#ffffff');
+    material.emissive = new THREE.Color('#2a78a8');
+    material.emissiveIntensity = isMobileWidth ? 0.46 : 0.3;
+    material.shininess = isMobileWidth ? 3 : 6;
+    if ('roughness' in material) material.roughness = isMobileWidth ? 0.82 : 0.72;
+    material.needsUpdate = true;
+  }
+
+  const scene = globe.scene?.();
+  if (!scene) return;
+
+  const lightSettings = [
+    {
+      name: 'mobile-friendly-ambient',
+      create: () => new THREE.AmbientLight('#ffffff'),
+      intensity: isMobileWidth ? 2.45 : 1.65,
+    },
+    {
+      name: 'mobile-friendly-front-light',
+      create: () => {
+        const light = new THREE.DirectionalLight('#ffffff');
+        light.position.set(1.2, 1.1, 1.6);
+        return light;
+      },
+      intensity: isMobileWidth ? 1.8 : 1.2,
+    },
+    {
+      name: 'mobile-friendly-fill-light',
+      create: () => {
+        const light = new THREE.DirectionalLight('#d9f4ff');
+        light.position.set(-1.4, 0.5, 1.1);
+        return light;
+      },
+      intensity: isMobileWidth ? 1.1 : 0.65,
+    },
+  ];
+
+  lightSettings.forEach((setting) => {
+    let light = scene.getObjectByName(setting.name);
+    if (!light) {
+      light = setting.create();
+      light.name = setting.name;
+      scene.add(light);
+    }
+    light.intensity = setting.intensity;
+  });
 }
 
 class GlobeErrorBoundary extends Component {
@@ -78,7 +134,10 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
   );
 
   useEffect(() => {
-    const handleResize = () => setGlobeSize(getGlobeSize());
+    const handleResize = () => {
+      setGlobeSize(getGlobeSize());
+      tuneGlobeBrightness(globeRef.current);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -95,6 +154,7 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
       controls.minDistance = 170;
       controls.maxDistance = 560;
 
+      tuneGlobeBrightness(globeRef.current);
       globeRef.current.pointOfView({ lat: 22, lng: 135, altitude: 2.25 }, 900);
     } catch {
       // The fallback boundary keeps the rest of the app visible if the 3D layer is not ready.
@@ -125,6 +185,7 @@ function WorldGlobe({ visibleCountries, selectedCountry, onCountrySelect }) {
         showAtmosphere
         atmosphereColor="#9ee9ff"
         atmosphereAltitude={0.18}
+        onGlobeReady={() => tuneGlobeBrightness(globeRef.current)}
         pointsData={markerData}
         pointLat="lat"
         pointLng="lng"
