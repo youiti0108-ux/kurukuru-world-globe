@@ -1,10 +1,12 @@
-const CACHE_NAME = 'kurukuru-world-globe-v7-ui-controls';
+const CACHE_NAME = 'kurukuru-world-globe-v11-local-japan-map';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icons/icon-192.svg',
   './icons/icon-512.svg',
+  './assets/japan-satellite.svg',
+  './data/japan-prefectures.geojson',
 ];
 
 self.addEventListener('install', (event) => {

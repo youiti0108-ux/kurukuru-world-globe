@@ -6,12 +6,16 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5173",
     "build": "vite build --base ./ && node scripts/inline-dist.cjs",
+    "build:japan-boundaries": "node scripts/build-japan-prefecture-geojson.cjs",
+    "build:japan-background": "node scripts/build-japan-satellite-svg.cjs",
+    "build:japan-map": "npm run build:japan-boundaries && npm run build:japan-background && node scripts/build-japan-map-paths.cjs",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "start": "npm run dev",
     "check": "npm run build"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.1",
+    "open-data-jp-prefectures-geojson": "^1.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-globe.gl": "^2.31.1",
