@@ -24,6 +24,17 @@ button {
   font: inherit;
 }
 
+ruby {
+  ruby-position: over;
+}
+
+rt {
+  font-size: 0.52em;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 .app-shell {
   position: relative;
   min-height: 100vh;
@@ -340,6 +351,29 @@ h1 {
   line-height: 1.6;
 }
 
+.top-tool-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.sound-toggle {
+  min-height: 42px;
+  min-width: 118px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(7, 19, 44, 0.58);
+  color: #d9efff;
+  font-weight: 900;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.sound-toggle.active {
+  background: linear-gradient(135deg, #ffe36e, #a9f3b0);
+  color: #10203f;
+}
+
 .globe-hint {
   position: absolute;
   bottom: 6px;
@@ -519,8 +553,59 @@ h1 {
   color: #10203f;
 }
 
+.quiz-range-select {
+  display: grid;
+  gap: 7px;
+  color: #263a5d;
+  font-weight: 900;
+}
+
+.quiz-select-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quiz-range-select span {
+  font-size: 0.9rem;
+}
+
+.quiz-range-select select {
+  min-height: 48px;
+  width: 100%;
+  border: 2px solid #bfe8ff;
+  border-radius: 8px;
+  background: #f7fbff;
+  color: #10203f;
+  font: inherit;
+  font-weight: 900;
+  padding: 0 12px;
+}
+
+.quiz-range-note {
+  margin: -4px 0 0;
+  color: #334b70;
+  font-weight: 900;
+  line-height: 1.55;
+}
+
 .quiz-card.correct {
+  position: relative;
+  overflow: hidden;
   animation: correct-pop 0.42s ease-out both;
+}
+
+.quiz-card.correct::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 25% 35%, rgba(255, 227, 110, 0.75) 0 3px, transparent 4px),
+    radial-gradient(circle at 62% 25%, rgba(114, 214, 255, 0.7) 0 3px, transparent 4px),
+    radial-gradient(circle at 74% 68%, rgba(169, 243, 176, 0.65) 0 3px, transparent 4px),
+    linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.5), transparent 58%);
+  pointer-events: none;
+  animation: sparkle-sweep 0.72s ease-out both;
 }
 
 .quiz-card.miss {
@@ -539,6 +624,10 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
+}
+
+.prefecture-score-board {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .score-board div {
@@ -642,6 +731,14 @@ h1 {
   grid-column: 1 / -1;
 }
 
+.key-hint {
+  margin: -4px 0 0;
+  color: #3b5274;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-align: center;
+}
+
 .japan-stage {
   position: relative;
   z-index: 1;
@@ -683,6 +780,10 @@ h1 {
   gap: 10px;
   width: 100%;
   min-height: 620px;
+}
+
+.japan-mode-row {
+  justify-self: center;
 }
 
 .map-tool-row {
@@ -809,6 +910,17 @@ h1 {
   vector-effect: non-scaling-stroke;
 }
 
+.region-outline-lines path.active-region {
+  stroke-width: 5;
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.45))
+    drop-shadow(0 0 6px rgba(2, 10, 24, 0.7));
+}
+
+.region-outline-lines path.muted-region {
+  opacity: 0.28;
+}
+
 .prefecture-svg-marker {
   cursor: pointer;
   outline: none;
@@ -830,6 +942,15 @@ h1 {
 .prefecture-svg-marker:focus-visible .prefecture-svg-dot {
   fill: #ffe36e;
   stroke: #10203f;
+}
+
+.prefecture-svg-marker.muted-marker {
+  opacity: 0.38;
+}
+
+.prefecture-svg-marker.muted-marker .prefecture-svg-dot {
+  fill: #8fb6c9;
+  stroke: rgba(255, 255, 255, 0.78);
 }
 
 .japan-map-attribution {
@@ -1065,6 +1186,22 @@ h1 {
   }
 }
 
+@keyframes sparkle-sweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-18%) rotate(0deg);
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(18%) rotate(2deg);
+  }
+}
+
 @keyframes gentle-shake {
   0%,
   100% {
@@ -1243,6 +1380,14 @@ h1 {
   .score-board {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
+  }
+
+  .prefecture-score-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quiz-select-grid {
+    grid-template-columns: 1fr;
   }
 
   .score-board div {

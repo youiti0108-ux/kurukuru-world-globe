@@ -69,9 +69,234 @@ const difficultyOptions = [
   { id: 'hard', label: 'むずかしい', includes: ['easy', 'normal', 'hard'] },
 ];
 
+const prefectureQuizRanges = [
+  {
+    id: 'all',
+    label: '全国',
+    prefectureIds: prefectures.map((prefecture) => prefecture.id),
+  },
+  {
+    id: 'hokkaido',
+    label: '北海道地方',
+    prefectureIds: ['hokkaido'],
+  },
+  {
+    id: 'tohoku',
+    label: '東北地方',
+    prefectureIds: ['aomori', 'iwate', 'miyagi', 'akita', 'yamagata', 'fukushima'],
+  },
+  {
+    id: 'kanto',
+    label: '関東地方',
+    prefectureIds: ['ibaraki', 'tochigi', 'gunma', 'saitama', 'chiba', 'tokyo', 'kanagawa'],
+  },
+  {
+    id: 'chubu',
+    label: '中部地方',
+    prefectureIds: [
+      'niigata',
+      'toyama',
+      'ishikawa',
+      'fukui',
+      'yamanashi',
+      'nagano',
+      'gifu',
+      'shizuoka',
+      'aichi',
+    ],
+  },
+  {
+    id: 'kinki',
+    label: '近畿地方',
+    prefectureIds: ['mie', 'shiga', 'kyoto', 'osaka', 'hyogo', 'nara', 'wakayama'],
+  },
+  {
+    id: 'chugoku',
+    label: '中国地方',
+    prefectureIds: ['tottori', 'shimane', 'okayama', 'hiroshima', 'yamaguchi'],
+  },
+  {
+    id: 'shikoku',
+    label: '四国地方',
+    prefectureIds: ['tokushima', 'kagawa', 'ehime', 'kochi'],
+  },
+  {
+    id: 'kyushu-okinawa',
+    label: '九州・沖縄地方',
+    prefectureIds: [
+      'fukuoka',
+      'saga',
+      'nagasaki',
+      'kumamoto',
+      'oita',
+      'miyazaki',
+      'kagoshima',
+      'okinawa',
+    ],
+  },
+];
+
+const prefectureQuizTypes = [
+  { id: 'prefecture', label: '都道府県をさがす' },
+  { id: 'capital', label: '県庁所在地からさがす' },
+];
+
 function getCountriesForDifficulty(difficulty) {
   const option = difficultyOptions.find((item) => item.id === difficulty) ?? difficultyOptions[0];
   return countries.filter((country) => option.includes.includes(country.difficulty));
+}
+
+function getPrefecturesForQuizRange(rangeId) {
+  const range = prefectureQuizRanges.find((item) => item.id === rangeId) ?? prefectureQuizRanges[0];
+  const idSet = new Set(range.prefectureIds);
+  return prefectures.filter((prefecture) => idSet.has(prefecture.id));
+}
+
+const countryKana = {
+  japan: 'にほん',
+  usa: 'アメリカ',
+  china: 'ちゅうごく',
+  korea: 'かんこく',
+  india: 'インド',
+  australia: 'オーストラリア',
+  france: 'フランス',
+  uk: 'イギリス',
+  brazil: 'ブラジル',
+  egypt: 'エジプト',
+  canada: 'カナダ',
+  mexico: 'メキシコ',
+  germany: 'ドイツ',
+  italy: 'イタリア',
+  spain: 'スペイン',
+  russia: 'ロシア',
+  thailand: 'タイ',
+  indonesia: 'インドネシア',
+  'south-africa': 'みなみアフリカ',
+  'saudi-arabia': 'サウジアラビア',
+  argentina: 'アルゼンチン',
+  chile: 'チリ',
+  peru: 'ペルー',
+  turkey: 'トルコ',
+  greece: 'ギリシャ',
+  netherlands: 'オランダ',
+  sweden: 'スウェーデン',
+  'new-zealand': 'ニュージーランド',
+  vietnam: 'ベトナム',
+  singapore: 'シンガポール',
+};
+
+const prefectureKana = {
+  hokkaido: 'ほっかいどう',
+  aomori: 'あおもりけん',
+  iwate: 'いわてけん',
+  miyagi: 'みやぎけん',
+  akita: 'あきたけん',
+  yamagata: 'やまがたけん',
+  fukushima: 'ふくしまけん',
+  ibaraki: 'いばらきけん',
+  tochigi: 'とちぎけん',
+  gunma: 'ぐんまけん',
+  saitama: 'さいたまけん',
+  chiba: 'ちばけん',
+  tokyo: 'とうきょうと',
+  kanagawa: 'かながわけん',
+  niigata: 'にいがたけん',
+  toyama: 'とやまけん',
+  ishikawa: 'いしかわけん',
+  fukui: 'ふくいけん',
+  yamanashi: 'やまなしけん',
+  nagano: 'ながのけん',
+  gifu: 'ぎふけん',
+  shizuoka: 'しずおかけん',
+  aichi: 'あいちけん',
+  mie: 'みえけん',
+  shiga: 'しがけん',
+  kyoto: 'きょうとふ',
+  osaka: 'おおさかふ',
+  hyogo: 'ひょうごけん',
+  nara: 'ならけん',
+  wakayama: 'わかやまけん',
+  tottori: 'とっとりけん',
+  shimane: 'しまねけん',
+  okayama: 'おかやまけん',
+  hiroshima: 'ひろしまけん',
+  yamaguchi: 'やまぐちけん',
+  tokushima: 'とくしまけん',
+  kagawa: 'かがわけん',
+  ehime: 'えひめけん',
+  kochi: 'こうちけん',
+  fukuoka: 'ふくおかけん',
+  saga: 'さがけん',
+  nagasaki: 'ながさきけん',
+  kumamoto: 'くまもとけん',
+  oita: 'おおいたけん',
+  miyazaki: 'みやざきけん',
+  kagoshima: 'かごしまけん',
+  okinawa: 'おきなわけん',
+};
+
+function RubyText({ children, rt }) {
+  if (!rt) return children;
+  return (
+    <ruby>
+      {children}
+      <rt>{rt}</rt>
+    </ruby>
+  );
+}
+
+function EntityName({ item, kanaMap }) {
+  return <RubyText rt={kanaMap[item.id]}>{item.name}</RubyText>;
+}
+
+function shouldHandleSpaceKey(event) {
+  if (event.code !== 'Space' && event.key !== ' ') return false;
+  const tagName = event.target?.tagName?.toLowerCase();
+  return tagName !== 'input' && tagName !== 'textarea' && tagName !== 'select';
+}
+
+let sharedAudioContext;
+
+function playAppSound(type, enabled) {
+  if (!enabled || typeof window === 'undefined') return;
+
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    sharedAudioContext ??= new AudioContext();
+    const context = sharedAudioContext;
+    const now = context.currentTime;
+    const output = context.createGain();
+    output.gain.setValueAtTime(0.0001, now);
+    output.gain.exponentialRampToValueAtTime(0.08, now + 0.012);
+    output.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+    output.connect(context.destination);
+
+    const notes = {
+      tap: [520],
+      next: [660, 880],
+      correct: [660, 880, 1175],
+      miss: [330, 260],
+    }[type] ?? [520];
+
+    notes.forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const start = now + index * 0.065;
+      oscillator.type = type === 'miss' ? 'triangle' : 'sine';
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(type === 'miss' ? 0.045 : 0.07, start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.13);
+      oscillator.connect(gain);
+      gain.connect(output);
+      oscillator.start(start);
+      oscillator.stop(start + 0.16);
+    });
+  } catch {
+    // Audio is decorative, so failures should never interrupt learning.
+  }
 }
 
 function getRandomCountry(countryPool, excludeIds = []) {
@@ -223,6 +448,22 @@ function ViewModeSwitch({ viewMode, onViewModeChange }) {
   );
 }
 
+function SoundToggle({ soundEnabled, onSoundEnabledChange, onPlaySound }) {
+  return (
+    <button
+      type="button"
+      className={`sound-toggle ${soundEnabled ? 'active' : ''}`}
+      aria-pressed={soundEnabled}
+      onClick={() => {
+        onPlaySound('tap');
+        onSoundEnabledChange((current) => !current);
+      }}
+    >
+      <RubyText rt="おと">音</RubyText>：{soundEnabled ? 'オン' : 'オフ'}
+    </button>
+  );
+}
+
 function PrefectureCard({ prefecture, onClose }) {
   if (!prefecture) {
     return (
@@ -241,12 +482,14 @@ function PrefectureCard({ prefecture, onClose }) {
       </div>
       <div className="card-copy">
         <p className="card-label">見つけた都道府県</p>
-        <h2>{prefecture.name}</h2>
+        <h2>
+          <EntityName item={prefecture} kanaMap={prefectureKana} />
+        </h2>
         <p className="capital">
-          県庁所在地 <strong>{prefecture.capital}</strong>
+          <RubyText rt="けんちょうしょざいち">県庁所在地</RubyText> <strong>{prefecture.capital}</strong>
         </p>
         <p className="region-line">
-          地方区分 <strong>{prefecture.region}</strong>
+          <RubyText rt="ちほうくぶん">地方区分</RubyText> <strong>{prefecture.region}</strong>
         </p>
         <p className="description">{prefecture.description}</p>
       </div>
@@ -257,7 +500,126 @@ function PrefectureCard({ prefecture, onClose }) {
   );
 }
 
-function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose }) {
+function PrefectureQuizPanel({
+  quizPrefecture,
+  quizRange,
+  quizRangeOptions,
+  quizType,
+  quizTypeOptions,
+  quizResult,
+  score,
+  answeredCorrectly,
+  remainingCount,
+  targetCount,
+  onQuizRangeChange,
+  onQuizTypeChange,
+  onNextQuestion,
+  onReset,
+}) {
+  return (
+    <article className={`quiz-card japan-quiz-card ${quizResult?.type ?? 'ready'}`} aria-live="polite">
+      <div className="quiz-heading">
+        <p className="card-label">都道府県クイズ</p>
+        <div className="target-pill">
+          <span aria-hidden="true">?</span>
+          <strong>{quizRange.label}・{quizType.label}</strong>
+        </div>
+        <h2>
+          {quizType.id === 'capital' ? (
+            <>
+              <RubyText rt="けんちょうしょざいち">県庁所在地</RubyText>が{quizPrefecture.capital}の
+              <RubyText rt="とどうふけん">都道府県</RubyText>をタップしてね！
+            </>
+          ) : (
+            <>
+              <EntityName item={quizPrefecture} kanaMap={prefectureKana} />
+              をさがしてタップしてね！
+            </>
+          )}
+        </h2>
+      </div>
+
+      <div className="quiz-select-grid">
+        <label className="quiz-range-select">
+          <span>出題範囲</span>
+          <select
+            value={quizRange.id}
+            onChange={(event) => onQuizRangeChange(event.target.value)}
+          >
+            {quizRangeOptions.map((range) => (
+              <option key={range.id} value={range.id}>
+                {range.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="quiz-range-select">
+          <span>クイズ種類</span>
+          <select
+            value={quizType.id}
+            onChange={(event) => onQuizTypeChange(event.target.value)}
+          >
+            {quizTypeOptions.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="score-board prefecture-score-board" aria-label="都道府県クイズのスコア">
+        <div>
+          <span>正解</span>
+          <strong>{score.correct}</strong>
+        </div>
+        <div>
+          <span>挑戦</span>
+          <strong>{score.attempts}</strong>
+        </div>
+        <div>
+          <span>連続正解</span>
+          <strong>{score.streak}</strong>
+        </div>
+        <div>
+          <span>残り</span>
+          <strong>{remainingCount}</strong>
+        </div>
+      </div>
+      <p className="quiz-range-note">
+        出題範囲：{quizRange.label}（{targetCount}問）
+      </p>
+
+      <div className={`quiz-message ${quizResult?.type ?? 'ready'}`}>
+        {quizResult ? (
+          <>
+            <strong>{quizResult.title}</strong>
+            <p>{quizResult.detail}</p>
+          </>
+        ) : (
+          <>
+            <strong>地図を拡大して都道府県を探そう！</strong>
+            <p>ピンをタップすると答え合わせをします。わからないときは地図を動かしてみよう。</p>
+          </>
+        )}
+      </div>
+
+      <div className="quiz-actions">
+        {answeredCorrectly && (
+          <button type="button" className="next-button" onClick={onNextQuestion}>
+            次の問題
+          </button>
+        )}
+        <button type="button" className="reset-button" onClick={onReset}>
+          リセット
+        </button>
+      </div>
+      {answeredCorrectly && <p className="key-hint">正解したら Space キーでも次へ進めます。</p>}
+    </article>
+  );
+}
+
+function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose, soundEnabled, onPlaySound }) {
   const mapContainerRef = useRef(null);
   const transformRef = useRef({ scale: 1, x: 0, y: 0 });
   const pointersRef = useRef(new Map());
@@ -266,7 +628,33 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose }) {
   const [mapTransform, setMapTransform] = useState({ scale: 1, x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [showPrefectureBorders, setShowPrefectureBorders] = useState(true);
+  const [japanMode, setJapanMode] = useState('learn');
+  const [prefectureQuizRangeId, setPrefectureQuizRangeId] = useState('all');
+  const [prefectureQuizTypeId, setPrefectureQuizTypeId] = useState('prefecture');
+  const [quizPrefecture, setQuizPrefecture] = useState(() => getRandomCountry(prefectures));
+  const [answeredPrefectureQuizIds, setAnsweredPrefectureQuizIds] = useState([]);
+  const [prefectureQuizResult, setPrefectureQuizResult] = useState(null);
+  const [prefectureAnsweredCorrectly, setPrefectureAnsweredCorrectly] = useState(false);
+  const [prefectureScore, setPrefectureScore] = useState({ correct: 0, attempts: 0, streak: 0 });
+  const prefectureAnswerLockedRef = useRef(false);
   const pinsVisible = mapTransform.scale >= JAPAN_PIN_SCALE_THRESHOLD;
+  const prefectureQuizRange =
+    prefectureQuizRanges.find((range) => range.id === prefectureQuizRangeId) ?? prefectureQuizRanges[0];
+  const prefectureQuizType =
+    prefectureQuizTypes.find((type) => type.id === prefectureQuizTypeId) ?? prefectureQuizTypes[0];
+  const quizPrefecturePool = useMemo(
+    () => getPrefecturesForQuizRange(prefectureQuizRangeId),
+    [prefectureQuizRangeId],
+  );
+  const quizRangeIdSet = useMemo(
+    () => new Set(quizPrefecturePool.map((prefecture) => prefecture.id)),
+    [quizPrefecturePool],
+  );
+  const remainingPrefectureCount = Math.max(
+    quizPrefecturePool.length -
+      answeredPrefectureQuizIds.filter((id) => quizRangeIdSet.has(id)).length,
+    0,
+  );
 
   const pinPositions = useMemo(
     () => new Map(japanPrefecturePins.map((pin) => [pin.id, pin])),
@@ -454,18 +842,160 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose }) {
 
   const mapTransformStyle = 'translate(' + mapTransform.x + ' ' + mapTransform.y + ') scale(' + mapTransform.scale + ')';
 
+  const startFreshPrefectureQuestion = (
+    previousId,
+    resetHistory = false,
+    targetPool = quizPrefecturePool,
+  ) => {
+    const targetIds = new Set(targetPool.map((prefecture) => prefecture.id));
+    const history = resetHistory
+      ? []
+      : answeredPrefectureQuizIds.filter((id) => targetIds.has(id));
+    const { nextCountry, nextAnsweredIds } = pickNextQuizCountry(targetPool, history, previousId);
+    setQuizPrefecture(nextCountry);
+    setAnsweredPrefectureQuizIds(nextAnsweredIds);
+    setPrefectureQuizResult(null);
+    setPrefectureAnsweredCorrectly(false);
+    prefectureAnswerLockedRef.current = false;
+    onClose();
+  };
+
+  const resetPrefectureQuiz = () => {
+    onPlaySound('tap');
+    startFreshPrefectureQuestion(quizPrefecture.id, true);
+    setPrefectureScore({ correct: 0, attempts: 0, streak: 0 });
+  };
+
+  const nextPrefectureQuestion = () => {
+    onPlaySound('next');
+    startFreshPrefectureQuestion(quizPrefecture.id);
+  };
+
+  const changePrefectureQuizRange = (nextRangeId) => {
+    onPlaySound('tap');
+    const nextPool = getPrefecturesForQuizRange(nextRangeId);
+    setPrefectureQuizRangeId(nextRangeId);
+    setAnsweredPrefectureQuizIds([]);
+    setPrefectureScore({ correct: 0, attempts: 0, streak: 0 });
+    setPrefectureQuizResult(null);
+    setPrefectureAnsweredCorrectly(false);
+    prefectureAnswerLockedRef.current = false;
+    setQuizPrefecture(getRandomCountry(nextPool, [quizPrefecture.id]));
+    onClose();
+  };
+
+  const changePrefectureQuizType = (nextTypeId) => {
+    onPlaySound('tap');
+    setPrefectureQuizTypeId(nextTypeId);
+    setAnsweredPrefectureQuizIds([]);
+    setPrefectureScore({ correct: 0, attempts: 0, streak: 0 });
+    setPrefectureQuizResult(null);
+    setPrefectureAnsweredCorrectly(false);
+    prefectureAnswerLockedRef.current = false;
+    setQuizPrefecture(getRandomCountry(quizPrefecturePool, [quizPrefecture.id]));
+    onClose();
+  };
+
+  const changeJapanMode = (nextMode) => {
+    onPlaySound('tap');
+    setJapanMode(nextMode);
+    onClose();
+    if (nextMode === 'quiz') {
+      setPrefectureQuizResult(null);
+      setPrefectureAnsweredCorrectly(false);
+      prefectureAnswerLockedRef.current = false;
+    }
+  };
+
+  const handlePrefecturePick = (prefecture) => {
+    if (japanMode === 'learn') {
+      onPrefectureSelect(prefecture);
+      return;
+    }
+
+    if (prefectureAnsweredCorrectly || prefectureAnswerLockedRef.current) return;
+
+    const isCorrect = prefecture.id === quizPrefecture.id;
+
+    if (isCorrect) {
+      prefectureAnswerLockedRef.current = true;
+      setAnsweredPrefectureQuizIds((currentIds) =>
+        currentIds.includes(prefecture.id) ? currentIds : [...currentIds, prefecture.id],
+      );
+    }
+
+    setPrefectureScore((currentScore) => ({
+      correct: currentScore.correct + (isCorrect ? 1 : 0),
+      attempts: currentScore.attempts + 1,
+      streak: isCorrect ? currentScore.streak + 1 : 0,
+    }));
+
+    if (isCorrect) {
+      setPrefectureAnsweredCorrectly(true);
+      onPlaySound('correct');
+      setPrefectureQuizResult({
+        type: 'correct',
+        title:
+          answeredPrefectureQuizIds.length + 1 >= quizPrefecturePool.length
+            ? '全問クリア！すごい！'
+            : '正解！やったね！',
+        detail:
+          prefectureQuizTypeId === 'capital'
+            ? `正解！${prefecture.name}の県庁所在地は${prefecture.capital}です。`
+            : `${prefecture.name}の県庁所在地は${prefecture.capital}です。${prefecture.region}にあります。`,
+      });
+    } else {
+      onPlaySound('miss');
+      setPrefectureQuizResult({
+        type: 'miss',
+        title: 'おしい！もう一回さがしてみよう',
+        detail: `${prefecture.name}ではなさそうです。地図を動かして、${quizPrefecture.name}を探してみよう。`,
+      });
+    }
+  };
+
   const handleMarkerKeyDown = (event, prefecture) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      onPrefectureSelect(prefecture);
+      handlePrefecturePick(prefecture);
     }
   };
+
+  useEffect(() => {
+    if (japanMode !== 'quiz' || !prefectureAnsweredCorrectly) return undefined;
+
+    const handleSpaceNext = (event) => {
+      if (!shouldHandleSpaceKey(event)) return;
+      event.preventDefault();
+      nextPrefectureQuestion();
+    };
+
+    window.addEventListener('keydown', handleSpaceNext);
+    return () => window.removeEventListener('keydown', handleSpaceNext);
+  }, [japanMode, prefectureAnsweredCorrectly, quizPrefecture.id]);
 
   return (
     <section className="japan-stage" aria-label={JAPAN_MAP_TEXT.sectionLabel}>
       <div className="japan-map-area">
         <div className="zoom-status" aria-live="polite">
           {pinsVisible ? JAPAN_MAP_TEXT.statusReady : JAPAN_MAP_TEXT.statusZoom}
+        </div>
+
+        <div className="japan-mode-row mode-switch" aria-label="日本地図のモード切り替え">
+          <button
+            type="button"
+            className={japanMode === 'learn' ? 'active' : ''}
+            onClick={() => changeJapanMode('learn')}
+          >
+            まなぶモード
+          </button>
+          <button
+            type="button"
+            className={japanMode === 'quiz' ? 'active' : ''}
+            onClick={() => changeJapanMode('quiz')}
+          >
+            クイズモード
+          </button>
         </div>
 
         <div className="map-tool-row">
@@ -521,6 +1051,13 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose }) {
                       {japanRegionOutlines.map((regionOutline) => (
                         <path
                           key={regionOutline.id}
+                          className={
+                            japanMode === 'quiz' && prefectureQuizRangeId !== 'all'
+                              ? regionOutline.id === prefectureQuizRangeId
+                                ? 'active-region'
+                                : 'muted-region'
+                              : ''
+                          }
                           d={regionOutline.d}
                           stroke={regionOutline.color}
                         />
@@ -538,7 +1075,12 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose }) {
                       return (
                         <g
                           key={prefecture.id}
-                          className="prefecture-svg-marker"
+                          className={
+                            'prefecture-svg-marker' +
+                            (japanMode === 'quiz' && !quizRangeIdSet.has(prefecture.id)
+                              ? ' muted-marker'
+                              : '')
+                          }
                           transform={'translate(' + pin.x + ' ' + pin.y + ')'}
                           role="button"
                           tabIndex="0"
@@ -546,7 +1088,7 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose }) {
                           onPointerDown={(event) => event.stopPropagation()}
                           onClick={(event) => {
                             event.stopPropagation();
-                            onPrefectureSelect(prefecture);
+                            handlePrefecturePick(prefecture);
                           }}
                           onKeyDown={(event) => handleMarkerKeyDown(event, prefecture)}
                         >
@@ -575,7 +1117,26 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose }) {
       </div>
 
       <aside className="country-panel japan-panel">
-        <PrefectureCard prefecture={selectedPrefecture} onClose={onClose} />
+        {japanMode === 'learn' ? (
+          <PrefectureCard prefecture={selectedPrefecture} onClose={onClose} />
+        ) : (
+          <PrefectureQuizPanel
+            quizPrefecture={quizPrefecture}
+            quizRange={prefectureQuizRange}
+            quizRangeOptions={prefectureQuizRanges}
+            quizType={prefectureQuizType}
+            quizTypeOptions={prefectureQuizTypes}
+            quizResult={prefectureQuizResult}
+            score={prefectureScore}
+            answeredCorrectly={prefectureAnsweredCorrectly}
+            remainingCount={remainingPrefectureCount}
+            targetCount={quizPrefecturePool.length}
+            onQuizRangeChange={changePrefectureQuizRange}
+            onQuizTypeChange={changePrefectureQuizType}
+            onNextQuestion={nextPrefectureQuestion}
+            onReset={resetPrefectureQuiz}
+          />
+        )}
       </aside>
     </section>
   );
@@ -777,10 +1338,14 @@ function LearnPanel({ selectedCountry, countryCount, onClose }) {
         <img src={getFlagUrl(selectedCountry)} alt="" loading="lazy" />
       </div>
       <div className="card-copy">
-        <p className="card-label">見つけた国</p>
-        <h2>{selectedCountry.name}</h2>
+        <p className="card-label">
+          <RubyText rt="み">見</RubyText>つけた<RubyText rt="くに">国</RubyText>
+        </p>
+        <h2>
+          <EntityName item={selectedCountry} kanaMap={countryKana} />
+        </h2>
         <p className="capital">
-          首都 <strong>{selectedCountry.capital}</strong>
+          <RubyText rt="しゅと">首都</RubyText> <strong>{selectedCountry.capital}</strong>
         </p>
         <p className="description">{selectedCountry.description}</p>
       </div>
@@ -808,7 +1373,10 @@ function QuizPanel({
           <span aria-hidden="true">?</span>
           <strong>{countryCount}か国から出題</strong>
         </div>
-        <h2>{quizCountry.name}をさがしてタップしてね！</h2>
+        <h2>
+          <EntityName item={quizCountry} kanaMap={countryKana} />
+          をさがしてタップしてね！
+        </h2>
       </div>
 
       <div className="score-board" aria-label="クイズのスコア">
@@ -850,6 +1418,7 @@ function QuizPanel({
           リセット
         </button>
       </div>
+      {answeredCorrectly && <p className="key-hint">正解したら Space キーでも次へ進めます。</p>}
     </article>
   );
 }
@@ -860,6 +1429,10 @@ export default function App() {
   const [difficulty, setDifficulty] = useState('easy');
   const [autoRotate, setAutoRotate] = useState(false);
   const [showBorders, setShowBorders] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.localStorage.getItem('kurukuru-sound-enabled') !== 'false';
+  });
   const visibleCountries = useMemo(() => getCountriesForDifficulty(difficulty), [difficulty]);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedPrefecture, setSelectedPrefecture] = useState(null);
@@ -874,7 +1447,15 @@ export default function App() {
 
   const highlightedCountry = mode === 'learn' ? selectedCountry : answeredCorrectly ? quizCountry : null;
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('kurukuru-sound-enabled', String(soundEnabled));
+  }, [soundEnabled]);
+
+  const playSound = (type) => playAppSound(type, soundEnabled);
+
   const changeViewMode = (nextViewMode) => {
+    playSound('tap');
     setViewMode(nextViewMode);
     setSelectedCountry(null);
     setSelectedPrefecture(null);
@@ -892,15 +1473,18 @@ export default function App() {
   };
 
   const resetQuiz = () => {
+    playSound('tap');
     startFreshQuestion(visibleCountries, quizCountry.id, true);
     setScore({ correct: 0, attempts: 0, streak: 0 });
   };
 
   const nextQuestion = () => {
+    playSound('next');
     startFreshQuestion(visibleCountries, quizCountry.id);
   };
 
   const changeMode = (nextMode) => {
+    playSound('tap');
     setMode(nextMode);
     setSelectedCountry(null);
     if (nextMode === 'quiz') {
@@ -909,6 +1493,7 @@ export default function App() {
   };
 
   const changeDifficulty = (nextDifficulty) => {
+    playSound('tap');
     const nextCountries = getCountriesForDifficulty(nextDifficulty);
     setDifficulty(nextDifficulty);
     setSelectedCountry(null);
@@ -945,12 +1530,17 @@ export default function App() {
 
     if (isCorrect) {
       setAnsweredCorrectly(true);
+      playSound('correct');
       setQuizResult({
         type: 'correct',
-        title: '正解！やったね！',
+        title:
+          answeredQuizIds.length + 1 >= visibleCountries.length
+            ? '全問クリア！すごい！'
+            : '正解！やったね！',
         detail: `${country.name}の首都は${country.capital}です。`,
       });
     } else {
+      playSound('miss');
       setQuizResult({
         type: 'miss',
         title: 'おしい！もう一回さがしてみよう',
@@ -958,6 +1548,19 @@ export default function App() {
       });
     }
   };
+
+  useEffect(() => {
+    if (viewMode !== 'world' || mode !== 'quiz' || !answeredCorrectly) return undefined;
+
+    const handleSpaceNext = (event) => {
+      if (!shouldHandleSpaceKey(event)) return;
+      event.preventDefault();
+      nextQuestion();
+    };
+
+    window.addEventListener('keydown', handleSpaceNext);
+    return () => window.removeEventListener('keydown', handleSpaceNext);
+  }, [viewMode, mode, answeredCorrectly, quizCountry.id]);
 
   return (
     <main className="app-shell">
@@ -968,6 +1571,13 @@ export default function App() {
         <h1>くるくる世界地球儀</h1>
         <p className="subtitle">地球を回して、世界の国を見つけよう</p>
         <ViewModeSwitch viewMode={viewMode} onViewModeChange={changeViewMode} />
+        <div className="top-tool-row">
+          <SoundToggle
+            soundEnabled={soundEnabled}
+            onSoundEnabledChange={setSoundEnabled}
+            onPlaySound={playSound}
+          />
+        </div>
         <p className="mode-note">
           {viewMode === 'japan'
             ? '日本地図を拡大して、都道府県のピンを探してみよう'
@@ -1002,8 +1612,14 @@ export default function App() {
               <GlobeControls
                 autoRotate={autoRotate}
                 showBorders={showBorders}
-                onAutoRotateChange={setAutoRotate}
-                onShowBordersChange={setShowBorders}
+                onAutoRotateChange={(nextValue) => {
+                  playSound('tap');
+                  setAutoRotate(nextValue);
+                }}
+                onShowBordersChange={(nextValue) => {
+                  playSound('tap');
+                  setShowBorders(nextValue);
+                }}
               />
             </>
           )}
@@ -1050,6 +1666,8 @@ export default function App() {
           selectedPrefecture={selectedPrefecture}
           onPrefectureSelect={setSelectedPrefecture}
           onClose={() => setSelectedPrefecture(null)}
+          soundEnabled={soundEnabled}
+          onPlaySound={playSound}
         />
       )}
     </main>
