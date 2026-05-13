@@ -2,6 +2,7 @@ import { Component, useEffect, useMemo, useRef, useState } from 'react';
 import Globe from 'react-globe.gl';
 import * as THREE from 'three';
 import { countries } from './countries.js';
+import { countryDescriptionRuby, prefectureDescriptionRuby } from './descriptionRuby.js';
 import { prefectures } from './prefectures.js';
 import {
   JAPAN_MAP_VIEWBOX,
@@ -235,7 +236,199 @@ const prefectureKana = {
   okinawa: 'おきなわけん',
 };
 
-function RubyText({ children, rt }) {
+const countryCapitalKana = {
+  japan: 'とうきょう',
+  usa: 'ワシントン',
+  china: 'ぺきん',
+  korea: 'ソウル',
+  india: 'ニューデリー',
+  australia: 'キャンベラ',
+  france: 'パリ',
+  uk: 'ロンドン',
+  brazil: 'ブラジリア',
+  egypt: 'カイロ',
+  canada: 'オタワ',
+  mexico: 'メキシコシティ',
+  germany: 'ベルリン',
+  italy: 'ローマ',
+  spain: 'マドリード',
+  russia: 'モスクワ',
+  thailand: 'バンコク',
+  indonesia: 'ジャカルタ',
+  'south-africa': 'プレトリア',
+  'saudi-arabia': 'リヤド',
+  argentina: 'ブエノスアイレス',
+  chile: 'サンティアゴ',
+  peru: 'リマ',
+  turkey: 'アンカラ',
+  greece: 'アテネ',
+  netherlands: 'アムステルダム',
+  sweden: 'ストックホルム',
+  'new-zealand': 'ウェリントン',
+  vietnam: 'ハノイ',
+  singapore: 'シンガポール',
+};
+
+const prefectureCapitalKana = {
+  hokkaido: 'さっぽろし',
+  aomori: 'あおもりし',
+  iwate: 'もりおかし',
+  miyagi: 'せんだいし',
+  akita: 'あきたし',
+  yamagata: 'やまがたし',
+  fukushima: 'ふくしまし',
+  ibaraki: 'みとし',
+  tochigi: 'うつのみやし',
+  gunma: 'まえばしし',
+  saitama: 'さいたまし',
+  chiba: 'ちばし',
+  tokyo: 'しんじゅくく',
+  kanagawa: 'よこはまし',
+  niigata: 'にいがたし',
+  toyama: 'とやまし',
+  ishikawa: 'かなざわし',
+  fukui: 'ふくいし',
+  yamanashi: 'こうふし',
+  nagano: 'ながのし',
+  gifu: 'ぎふし',
+  shizuoka: 'しずおかし',
+  aichi: 'なごやし',
+  mie: 'つし',
+  shiga: 'おおつし',
+  kyoto: 'きょうとし',
+  osaka: 'おおさかし',
+  hyogo: 'こうべし',
+  nara: 'ならし',
+  wakayama: 'わかやまし',
+  tottori: 'とっとりし',
+  shimane: 'まつえし',
+  okayama: 'おかやまし',
+  hiroshima: 'ひろしまし',
+  yamaguchi: 'やまぐちし',
+  tokushima: 'とくしまし',
+  kagawa: 'たかまつし',
+  ehime: 'まつやまし',
+  kochi: 'こうちし',
+  fukuoka: 'ふくおかし',
+  saga: 'さがし',
+  nagasaki: 'ながさきし',
+  kumamoto: 'くまもとし',
+  oita: 'おおいたし',
+  miyazaki: 'みやざきし',
+  kagoshima: 'かごしまし',
+  okinawa: 'なはし',
+};
+
+const regionKana = {
+  北海道地方: 'ほっかいどうちほう',
+  東北地方: 'とうほくちほう',
+  関東地方: 'かんとうちほう',
+  中部地方: 'ちゅうぶちほう',
+  近畿地方: 'きんきちほう',
+  中国地方: 'ちゅうごくちほう',
+  四国地方: 'しこくちほう',
+  '九州・沖縄地方': 'きゅうしゅう・おきなわちほう',
+};
+
+const commonRubyTerms = [
+  ['都道府県', 'とどうふけん'],
+  ['県庁所在地', 'けんちょうしょざいち'],
+  ['地方区分', 'ちほうくぶん'],
+  ['地方', 'ちほう'],
+  ['首都', 'しゅと'],
+  ['正解', 'せいかい'],
+  ['不正解', 'ふせいかい'],
+  ['全問', 'ぜんもん'],
+  ['問題', 'もんだい'],
+  ['挑戦', 'ちょうせん'],
+  ['連続', 'れんぞく'],
+  ['残り', 'のこり'],
+  ['出題範囲', 'しゅつだいはんい'],
+  ['有名', 'ゆうめい'],
+  ['自然', 'しぜん'],
+  ['文化', 'ぶんか'],
+  ['歴史', 'れきし'],
+  ['世界', 'せかい'],
+  ['国', 'くに'],
+  ['島国', 'しまぐに'],
+  ['四季', 'しき'],
+  ['海', 'うみ'],
+  ['山', 'やま'],
+  ['川', 'かわ'],
+  ['湖', 'みずうみ'],
+  ['森', 'もり'],
+  ['都市', 'とし'],
+  ['建物', 'たてもの'],
+  ['料理', 'りょうり'],
+  ['国立公園', 'こくりつこうえん'],
+  ['人口', 'じんこう'],
+  ['古い', 'ふるい'],
+  ['大きな', 'おおきな'],
+  ['広い', 'ひろい'],
+  ['美しい', 'うつくしい'],
+  ['富士山', 'ふじさん'],
+  ['お茶', 'おちゃ'],
+  ['東京', 'とうきょう'],
+  ['北海道', 'ほっかいどう'],
+  ['沖縄', 'おきなわ'],
+  ['日本', 'にほん'],
+];
+
+function makeRubyParts(text, terms) {
+  if (!text) return [];
+
+  const uniqueTerms = new Map();
+  [...commonRubyTerms, ...terms].forEach(([term, ruby]) => {
+    if (term && ruby) uniqueTerms.set(term, ruby);
+  });
+  const sortedTerms = Array.from(uniqueTerms.entries()).sort((a, b) => b[0].length - a[0].length);
+  const parts = [];
+  let index = 0;
+
+  while (index < text.length) {
+    const match = sortedTerms.find(([term]) => text.startsWith(term, index));
+    if (match) {
+      parts.push({ text: match[0], ruby: match[1] });
+      index += match[0].length;
+    } else {
+      const last = parts[parts.length - 1];
+      const char = text[index];
+      if (last && !last.ruby) {
+        last.text += char;
+      } else {
+        parts.push({ text: char });
+      }
+      index += 1;
+    }
+  }
+
+  return parts;
+}
+
+function buildRubyParts(text, item, nameKanaMap, capitalKanaMap) {
+  const itemTerms = [];
+  if (item) {
+    itemTerms.push([item.name, nameKanaMap[item.id]]);
+    itemTerms.push([item.capital, capitalKanaMap?.[item.id]]);
+    itemTerms.push([item.region, regionKana[item.region]]);
+  }
+  return makeRubyParts(text, itemTerms);
+}
+
+function RubyText({ children, rt, parts }) {
+  if (parts) {
+    return parts.map((part, index) =>
+      part.ruby ? (
+        <ruby key={`${part.text}-${index}`}>
+          {part.text}
+          <rt>{part.ruby}</rt>
+        </ruby>
+      ) : (
+        <span key={`${part.text}-${index}`}>{part.text}</span>
+      ),
+    );
+  }
+
   if (!rt) return children;
   return (
     <ruby>
@@ -486,12 +679,22 @@ function PrefectureCard({ prefecture, onClose }) {
           <EntityName item={prefecture} kanaMap={prefectureKana} />
         </h2>
         <p className="capital">
-          <RubyText rt="けんちょうしょざいち">県庁所在地</RubyText> <strong>{prefecture.capital}</strong>
+          <RubyText rt="けんちょうしょざいち">県庁所在地</RubyText>{' '}
+          <strong>
+            <RubyText rt={prefectureCapitalKana[prefecture.id]}>{prefecture.capital}</RubyText>
+          </strong>
         </p>
         <p className="region-line">
-          <RubyText rt="ちほうくぶん">地方区分</RubyText> <strong>{prefecture.region}</strong>
+          <RubyText rt="ちほうくぶん">地方区分</RubyText>{' '}
+          <strong>
+            <RubyText rt={regionKana[prefecture.region]}>{prefecture.region}</RubyText>
+          </strong>
         </p>
-        <p className="description">{prefecture.description}</p>
+        <p className="description">
+          <RubyText
+            parts={prefectureDescriptionRuby[prefecture.id] ?? [{ text: prefecture.description }]}
+          />
+        </p>
       </div>
       <button type="button" className="close-button" onClick={onClose}>
         とじる
@@ -593,8 +796,12 @@ function PrefectureQuizPanel({
       <div className={`quiz-message ${quizResult?.type ?? 'ready'}`}>
         {quizResult ? (
           <>
-            <strong>{quizResult.title}</strong>
-            <p>{quizResult.detail}</p>
+            <strong>
+              <RubyText parts={quizResult.titleParts}>{quizResult.title}</RubyText>
+            </strong>
+            <p>
+              <RubyText parts={quizResult.detailParts}>{quizResult.detail}</RubyText>
+            </p>
           </>
         ) : (
           <>
@@ -943,6 +1150,20 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose, soundEn
           prefectureQuizTypeId === 'capital'
             ? `正解！${prefecture.name}の県庁所在地は${prefecture.capital}です。`
             : `${prefecture.name}の県庁所在地は${prefecture.capital}です。${prefecture.region}にあります。`,
+        titleParts: makeRubyParts(
+          answeredPrefectureQuizIds.length + 1 >= quizPrefecturePool.length
+            ? '全問クリア！すごい！'
+            : '正解！やったね！',
+          [],
+        ),
+        detailParts: buildRubyParts(
+          prefectureQuizTypeId === 'capital'
+            ? `正解！${prefecture.name}の県庁所在地は${prefecture.capital}です。`
+            : `${prefecture.name}の県庁所在地は${prefecture.capital}です。${prefecture.region}にあります。`,
+          prefecture,
+          prefectureKana,
+          prefectureCapitalKana,
+        ),
       });
     } else {
       onPlaySound('miss');
@@ -950,6 +1171,17 @@ function JapanMapMode({ selectedPrefecture, onPrefectureSelect, onClose, soundEn
         type: 'miss',
         title: 'おしい！もう一回さがしてみよう',
         detail: `${prefecture.name}ではなさそうです。地図を動かして、${quizPrefecture.name}を探してみよう。`,
+        titleParts: makeRubyParts('おしい！もう一回さがしてみよう', [['一回', 'いっかい']]),
+        detailParts: makeRubyParts(
+          `${prefecture.name}ではなさそうです。地図を動かして、${quizPrefecture.name}を探してみよう。`,
+          [
+            [prefecture.name, prefectureKana[prefecture.id]],
+            [quizPrefecture.name, prefectureKana[quizPrefecture.id]],
+            ['地図', 'ちず'],
+            ['動かして', 'うごかして'],
+            ['探して', 'さがして'],
+          ],
+        ),
       });
     }
   };
@@ -1345,9 +1577,16 @@ function LearnPanel({ selectedCountry, countryCount, onClose }) {
           <EntityName item={selectedCountry} kanaMap={countryKana} />
         </h2>
         <p className="capital">
-          <RubyText rt="しゅと">首都</RubyText> <strong>{selectedCountry.capital}</strong>
+          <RubyText rt="しゅと">首都</RubyText>{' '}
+          <strong>
+            <RubyText rt={countryCapitalKana[selectedCountry.id]}>{selectedCountry.capital}</RubyText>
+          </strong>
         </p>
-        <p className="description">{selectedCountry.description}</p>
+        <p className="description">
+          <RubyText
+            parts={countryDescriptionRuby[selectedCountry.id] ?? [{ text: selectedCountry.description }]}
+          />
+        </p>
       </div>
       <button type="button" className="close-button" onClick={onClose}>
         とじる
@@ -1397,8 +1636,12 @@ function QuizPanel({
       <div className={`quiz-message ${quizResult?.type ?? 'ready'}`}>
         {quizResult ? (
           <>
-            <strong>{quizResult.title}</strong>
-            <p>{quizResult.detail}</p>
+            <strong>
+              <RubyText parts={quizResult.titleParts}>{quizResult.title}</RubyText>
+            </strong>
+            <p>
+              <RubyText parts={quizResult.detailParts}>{quizResult.detail}</RubyText>
+            </p>
           </>
         ) : (
           <>
@@ -1538,6 +1781,18 @@ export default function App() {
             ? '全問クリア！すごい！'
             : '正解！やったね！',
         detail: `${country.name}の首都は${country.capital}です。`,
+        titleParts: makeRubyParts(
+          answeredQuizIds.length + 1 >= visibleCountries.length
+            ? '全問クリア！すごい！'
+            : '正解！やったね！',
+          [],
+        ),
+        detailParts: buildRubyParts(
+          `${country.name}の首都は${country.capital}です。`,
+          country,
+          countryKana,
+          countryCapitalKana,
+        ),
       });
     } else {
       playSound('miss');
@@ -1545,6 +1800,17 @@ export default function App() {
         type: 'miss',
         title: 'おしい！もう一回さがしてみよう',
         detail: `${country.name}ではなさそうです。地球を回して、${quizCountry.name}を探してみよう。`,
+        titleParts: makeRubyParts('おしい！もう一回さがしてみよう', [['一回', 'いっかい']]),
+        detailParts: makeRubyParts(
+          `${country.name}ではなさそうです。地球を回して、${quizCountry.name}を探してみよう。`,
+          [
+            [country.name, countryKana[country.id]],
+            [quizCountry.name, countryKana[quizCountry.id]],
+            ['地球', 'ちきゅう'],
+            ['回して', 'まわして'],
+            ['探して', 'さがして'],
+          ],
+        ),
       });
     }
   };
